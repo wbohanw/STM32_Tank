@@ -10,23 +10,25 @@ ZOMBIE_SPEED_PIXELS = 1  # How many pixels per second the zombie travels
 
 SCREEN_WIDTH = 1200
 SCREEN_HEIGHT = 900
+SIZE_TANK = 100
+SIZE_ZOMBIE = 100
 SCREEN_MIDDLE = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
-
+SPAWN_RATE = 0.05
 SCREEN_TITLE = "Rotating Tank Example"
 
 from PIL import Image
 
-image = Image.open("code/ui/942355.png")
-image = image.resize((40, 48))
+image = Image.open("code/ui/tank.png")
+image = image.resize((SIZE_TANK, SIZE_TANK))
 image = image.rotate(180)
-image.save("code/ui/942355_rotated.png")
+image.save("code/ui/tank_rotated.png")
 
-image = Image.open("code/ui/export_move.gif")
-image = image.resize((40, 48))
-image.save("code/ui/export_move_rotated.gif")
+image = Image.open("code/ui/zombie.gif")
+image = image.resize((SIZE_ZOMBIE, SIZE_ZOMBIE))
+image.save("code/ui/zombie_rotated.gif")
 # These paths are built-in resources included with arcade
-TANK_BODY_PATH = "code/ui/942355_rotated.png"
-ZOMBIE_PATH = "code/ui/export_move_rotated.gif"
+TANK_BODY_PATH = "code/ui/tank_rotated.png"
+ZOMBIE_PATH = "code/ui/zombie_rotated.gif"
 
 class ExampleWindow(arcade.Window):
 
@@ -57,7 +59,7 @@ class ExampleWindow(arcade.Window):
         self.score_texts = []
 
         self.control_text = arcade.Text(
-            "Arrow keys to move tank, SPACE to shoot",
+            "Use the board to move the tank and shoot with the blue button",
             SCREEN_MIDDLE[0], 15,
             anchor_x='center')
 
@@ -66,6 +68,16 @@ class ExampleWindow(arcade.Window):
             "Game Over! Press R to Restart",
             SCREEN_MIDDLE[0], SCREEN_MIDDLE[1],
             anchor_x='center', color=arcade.color.RED, font_size=24)
+
+        self.pressed_keys = set()  # Initialize pressed_keys as a set
+
+    def on_key_press(self, key, modifiers):
+        """Called whenever a key is pressed."""
+        self.pressed_keys.add(key)
+
+    def on_key_release(self, key, modifiers):
+        """Called whenever a key is released."""
+        self.pressed_keys.discard(key)
 
     def on_draw(self):
         self.clear()
@@ -105,10 +117,18 @@ class ExampleWindow(arcade.Window):
             self.move_tank(delta_time)
             self.bullet_list.update()
             self.zombie_list.update()
+            self.update_zombie_directions()  # Update zombie directions towards the tank
             self.spawn_zombies()
             self.check_for_collisions()
             self.check_bullet_hits()
             self.update_score_texts(delta_time)
+        else:
+            # Check if R key is pressed to restart the game
+            if arcade.key.R in self.pressed_keys:
+                tx_string = "GAME_OVER\n"
+                bytes_written = self.ser.write(tx_string.encode())
+                print(f"Bytes written: {bytes_written}")
+                self.restart_game()
 
     def read_serial_data(self):
         try:
@@ -151,29 +171,6 @@ class ExampleWindow(arcade.Window):
         if 0 <= new_x <= SCREEN_WIDTH and 0 <= new_y <= SCREEN_HEIGHT:
             self.tank.position = new_x, new_y
 
-    def on_key_press(self, symbol: int, modifiers: int):
-        if symbol == arcade.key.UP:
-            self.tank_direction += 1
-        elif symbol == arcade.key.DOWN:
-            self.tank_direction -= 1
-        elif symbol == arcade.key.LEFT:
-            self.tank_turning += 1
-        elif symbol == arcade.key.RIGHT:
-            self.tank_turning -= 1
-        elif symbol == arcade.key.SPACE:
-            self.shoot_bullet()
-        elif symbol == arcade.key.R and self.game_over:
-            self.restart_game()
-
-    def on_key_release(self, symbol: int, modifiers: int):
-        if symbol == arcade.key.UP:
-            self.tank_direction -= 1
-        elif symbol == arcade.key.DOWN:
-            self.tank_direction += 1
-        elif symbol == arcade.key.LEFT:
-            self.tank_turning -= 1
-        elif symbol == arcade.key.RIGHT:
-            self.tank_turning += 1
 
     def shoot_bullet(self):
         bullet = arcade.SpriteCircle(5, arcade.color.YELLOW)
@@ -184,7 +181,7 @@ class ExampleWindow(arcade.Window):
         self.bullet_list.append(bullet)
 
     def spawn_zombies(self):
-        if random.random() < 0.01:  # Slow spawn rate
+        if random.random() < SPAWN_RATE:  # Slow spawn rate
             margin = random.choice(['top', 'bottom', 'left', 'right'])
             if margin == 'top':
                 x = random.randint(0, SCREEN_WIDTH)
@@ -206,9 +203,18 @@ class ExampleWindow(arcade.Window):
             zombie.change_y = math.sin(math.radians(zombie.angle)) * ZOMBIE_SPEED_PIXELS
             self.zombie_list.append(zombie)
 
+    def update_zombie_directions(self):
+        for zombie in self.zombie_list:
+            zombie.angle = math.degrees(math.atan2(self.tank.center_y - zombie.center_y, self.tank.center_x - zombie.center_x))
+            zombie.change_x = math.cos(math.radians(zombie.angle)) * ZOMBIE_SPEED_PIXELS
+            zombie.change_y = math.sin(math.radians(zombie.angle)) * ZOMBIE_SPEED_PIXELS
+
     def check_for_collisions(self):
         if arcade.check_for_collision_with_list(self.tank, self.zombie_list):
             self.game_over = True
+            tx_string = "GAME_OVER\n"
+            bytes_written = self.ser.write(tx_string.encode())
+            print(f"Bytes written: {bytes_written}")
 
     def check_bullet_hits(self):
         for bullet in self.bullet_list:

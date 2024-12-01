@@ -50,7 +50,7 @@ int16_t accelero_p2[3] = {0,0,0};
 int16_t accelero_p3[3] = {0,0,0};
 
 int16_t accelero[3] = {0,0,0};
-
+int game_sts = 0;
 // Calibration offsets
 float OFFX = 0.0f;
 float OFFY = 0.0f;
@@ -661,9 +661,16 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     HAL_UART_Receive_IT(&huart1, rxBuffer, 10);
 
     if (strstr((char *)rxBuffer, "GAME_OVER\n") != NULL) {
-      play_gameover_sound();
+    	if(!game_sts) {
+    		play_gameover_sound();
+    	   game_sts = 1;
+    	} else {
+    	   play_start_sound();
+    		game_sts = 0;
+    	}
       memset(rxBuffer, 0, sizeof(rxBuffer));
     }
+
   }
 }
 
