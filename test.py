@@ -8,8 +8,8 @@ TANK_TURN_SPEED_DEGREES = 40  # How fast the tank's body can turn
 BULLET_SPEED_PIXELS = 6  # How many pixels per second the bullet travels
 ZOMBIE_SPEED_PIXELS = 1  # How many pixels per second the zombie travels
 
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
+SCREEN_WIDTH = 1200
+SCREEN_HEIGHT = 900
 SCREEN_MIDDLE = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
 
 SCREEN_TITLE = "Rotating Tank Example"
@@ -17,12 +17,12 @@ SCREEN_TITLE = "Rotating Tank Example"
 from PIL import Image
 
 image = Image.open("code/ui/942355.png")
-image = image.resize((20, 24))
+image = image.resize((40, 48))
 image = image.rotate(180)
 image.save("code/ui/942355_rotated.png")
 
 image = Image.open("code/ui/export_move.gif")
-image = image.resize((20, 24))
+image = image.resize((40, 48))
 image.save("code/ui/export_move_rotated.gif")
 # These paths are built-in resources included with arcade
 TANK_BODY_PATH = "code/ui/942355_rotated.png"
@@ -92,9 +92,9 @@ class ExampleWindow(arcade.Window):
 
             # Use the y_value to control the tank's movement
             if y_value > 5:
-                self.tank_direction = 1  # Move forward
+                self.tank_direction = -1  # Move forward
             elif y_value < -5:
-                self.tank_direction = -1  # Move backward
+                self.tank_direction = 1  # Move backward
             else:
                 self.tank_direction = 0  # No movement
 
@@ -114,11 +114,15 @@ class ExampleWindow(arcade.Window):
         try:
             serial_data = self.ser.readline().decode()
             print(serial_data)
-            x_value_str = serial_data.split(",")[0].split(":")[1].strip()
-            x_value = float(x_value_str)
-            y_value_str = serial_data.split(",")[1].split(":")[1].strip()
-            y_value = float(y_value_str)
-            shoot_str = serial_data.split(",")[3].split(":")[1].strip()
+            if 'calibration' in serial_data or 'Calibration' in serial_data:
+                return 0, 0, 0
+            else:
+                data_parts = serial_data.split(",")
+                x_value_str = data_parts[0].split(":")[1].strip() if len(data_parts) > 0 else "0"
+                x_value = float(x_value_str)
+                y_value_str = data_parts[1].split(":")[1].strip() if len(data_parts) > 1 else "0"
+                y_value = float(y_value_str)
+                shoot_str = data_parts[3].split(":")[1].strip() if len(data_parts) > 3 else "0"
             shoot = int(shoot_str)
         except (ValueError, serial.SerialException):
             x_value = 0
@@ -140,7 +144,12 @@ class ExampleWindow(arcade.Window):
         y_dir = math.sin(self.tank.radians - math.pi / 2) * move_magnitude
 
         # Move the tank's body
-        self.tank.position = self.tank.center_x + x_dir, self.tank.center_y + y_dir
+        new_x = self.tank.center_x + x_dir
+        new_y = self.tank.center_y + y_dir
+
+        # Ensure the tank does not move out of the boundary
+        if 0 <= new_x <= SCREEN_WIDTH and 0 <= new_y <= SCREEN_HEIGHT:
+            self.tank.position = new_x, new_y
 
     def on_key_press(self, symbol: int, modifiers: int):
         if symbol == arcade.key.UP:
@@ -218,12 +227,7 @@ class ExampleWindow(arcade.Window):
         self.score_texts.append((score_text, 2.0))  # 2 seconds duration
 
     def update_score_texts(self, delta_time):
-        for i, (score_text, time_left) in enumerate(self.score_texts):
-            time_left -= delta_time
-            if time_left <= 0:
-                self.score_texts.pop(i)
-            else:
-                self.score_texts[i] = (score_text, time_left)
+        self.score_texts = [(score_text, time_left - delta_time) for score_text, time_left in self.score_texts if time_left - delta_time > 0]
 
     def draw_score(self):
         score_display = arcade.Text(
@@ -241,7 +245,7 @@ class ExampleWindow(arcade.Window):
 
 def main():
     window = ExampleWindow()
-    window.run()
+    arcade.run()
 
 if __name__ == '__main__':
     main()

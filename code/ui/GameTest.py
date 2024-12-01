@@ -17,11 +17,7 @@ OBSTACLE_SPEED = 5
 OBSTACLE_MOVEMENT_SPEED = 2
 
 # Initialize serial port
-<<<<<<< Updated upstream
-serial_port = '/dev/cu.usbmodem11403'
-=======
 serial_port = '/dev/cu.usbmodem1303'
->>>>>>> Stashed changes
 
 ser = serial.Serial(port=serial_port, baudrate=115200)
 print(f"Using serial port: {serial_port}")

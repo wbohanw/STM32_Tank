@@ -167,9 +167,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
             BSP_ACCELERO_AccGetXYZ(accelero_p3);
         }
 
-<<<<<<< Updated upstream
-        current_position++;
-=======
+
 	        current_position++;
 
 	        if (current_position > 3) {
@@ -177,7 +175,6 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 	            printf("Calibration complete!\r\n");
 	        }
 	    }
-	}
 
 	if(calibrationDone) {
 //		if(GPIO_Pin == myButton_Pin) {
@@ -191,13 +188,6 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 	        button_pressed = 1;  // Set flag on button press
 	    }
 	}
->>>>>>> Stashed changes
-
-        if (current_position > 3) {
-            calibrationDone = 1;
-            printf("Calibration complete!\r\n");
-        }
-    }
 }
 
 void calibrate_accelerometer() {
@@ -310,7 +300,6 @@ int main(void)
 
 	    }
 
-	  HAL_Delay(50);
 
 	  BSP_ACCELERO_AccGetXYZ(accelero);
 
@@ -335,18 +324,13 @@ int main(void)
 	  // Convert radians to degrees if needed
 	  float tilt_degrees = tilt * 180 / PI;
 
-<<<<<<< Updated upstream
-	  sprintf(txBuffer, "Calibrated Accelero X: %f, Y: %f, Tilt degrees: %f \r\n", ACCX, ACCY, tilt_degrees);
-=======
->>>>>>> Stashed changes
-
 
 	  sprintf(txBuffer, "Calibrated Accelero X: %f, Y: %f, Tilt degrees: %f, Shoot: %d \r\n", ACCX, ACCY, tilt_degrees, temp);
 	  temp = 0;
 //	  sprintf(output, "Accelero X: %d, Y: %d, Z: %d \r\n", accelero[0], accelero[1], accelero[2]);
-	  HAL_Delay(10);
+	  HAL_Delay(5);
 	  HAL_UART_Transmit(&huart1, (uint8_t *)txBuffer, SIZE_BUFFER,100);
-	  HAL_Delay(25);
+	  HAL_Delay(5);
 	  for(int i = 0; i < SIZE_BUFFER; i++) {
 	       txBuffer[i] = 0;
 	  }
