@@ -1,9 +1,10 @@
 import arcade
 import math
 import random
+import serial  # Import the serial library
 
-TANK_SPEED_PIXELS = 64  # How many pixels per second the tank travels
-TANK_TURN_SPEED_DEGREES = 70  # How fast the tank's body can turn
+TANK_SPEED_PIXELS = 40  # How many pixels per second the tank travels
+TANK_TURN_SPEED_DEGREES = 40  # How fast the tank's body can turn
 BULLET_SPEED_PIXELS = 6  # How many pixels per second the bullet travels
 ZOMBIE_SPEED_PIXELS = 1  # How many pixels per second the zombie travels
 
@@ -31,6 +32,11 @@ class ExampleWindow(arcade.Window):
 
     def __init__(self):
         super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
+
+        # Initialize serial port
+        self.serial_port = '/dev/cu.usbmodem1303'  # Update with your serial port
+        self.ser = serial.Serial(port=self.serial_port, baudrate=115200)
+        print(f"Using serial port: {self.serial_port}")
 
         # Set Background to be green
         self.background_color = arcade.csscolor.SEA_GREEN
@@ -73,6 +79,25 @@ class ExampleWindow(arcade.Window):
 
     def on_update(self, delta_time: float):
         if not self.game_over:
+            # Read the x_value from the serial port
+            x_value, y_value = self.read_serial_data()
+
+            # Use the x_value to control the tank's turning
+            if x_value < -10:
+                self.tank_turning = -1  # Turn left
+            elif x_value > 10:
+                self.tank_turning = 1  # Turn right
+            else:
+                self.tank_turning = 0  # No turning
+
+            # Use the y_value to control the tank's movement
+            if y_value > 5:
+                self.tank_direction = 1  # Move forward
+            elif y_value < -5:
+                self.tank_direction = -1  # Move backward
+            else:
+                self.tank_direction = 0  # No movement
+
             self.move_tank(delta_time)
             self.bullet_list.update()
             self.zombie_list.update()
@@ -80,6 +105,19 @@ class ExampleWindow(arcade.Window):
             self.check_for_collisions()
             self.check_bullet_hits()
             self.update_score_texts(delta_time)
+
+    def read_serial_data(self):
+        try:
+            serial_data = self.ser.readline().decode()
+            print(serial_data)
+            x_value_str = serial_data.split(",")[0].split(":")[1].strip()
+            x_value = float(x_value_str)
+            y_value_str = serial_data.split(",")[1].split(":")[1].strip()
+            y_value = float(y_value_str)
+        except (ValueError, serial.SerialException):
+            x_value = 0
+            y_value = 0
+        return x_value, y_value
 
     def move_tank(self, delta_time):
         """
