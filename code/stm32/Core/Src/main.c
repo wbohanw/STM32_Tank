@@ -152,33 +152,27 @@ void play_start_sound(){
 	HAL_TIM_Base_Start_IT(&htim2);
 }
 
-// This function is used for the calibration of the accelerometer
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
-    // Check if the interrupt is triggered by the push button
-    if(GPIO_Pin == myButton_Pin) {
-		  if (current_position == 0) {
-			  // Record accelerometer data at position P0
-			  BSP_ACCELERO_AccGetXYZ(accelero_p0);
-		  }
-		  else if (current_position == 1) {
-			  // Record accelerometer data at position P1
-			  BSP_ACCELERO_AccGetXYZ(accelero_p1);
-		  }
-		  else if (current_position == 2) {
-			  // Record accelerometer data at position P2
-			  BSP_ACCELERO_AccGetXYZ(accelero_p2);
-		  }
-		  else if (current_position == 3) {
-			  // Record accelerometer data at position P3
-			  BSP_ACCELERO_AccGetXYZ(accelero_p3);
-		  }
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
+    if (GPIO_Pin == myButton_Pin) {
+        printf("Button Pressed! Current Position: %d\r\n", current_position);
 
-		  current_position = current_position + 1;
+        // Record accelerometer data
+        if (current_position == 0) {
+            BSP_ACCELERO_AccGetXYZ(accelero_p0);
+        } else if (current_position == 1) {
+            BSP_ACCELERO_AccGetXYZ(accelero_p1);
+        } else if (current_position == 2) {
+            BSP_ACCELERO_AccGetXYZ(accelero_p2);
+        } else if (current_position == 3) {
+            BSP_ACCELERO_AccGetXYZ(accelero_p3);
+        }
 
-		  // If all positions are calibrated, set calibrationDone flag
-			if (current_position > 3) {
-				calibrationDone = 1;
-			}
+        current_position++;
+
+        if (current_position > 3) {
+            calibrationDone = 1;
+            printf("Calibration complete!\r\n");
+        }
     }
 }
 
@@ -276,6 +270,11 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   play_start_sound();
+
+
+
+
+
   while (1)
   {
 	  //rxStatus = HAL_UART_Receive_IT(&huart1, rxBuffer, 100);
@@ -318,6 +317,8 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
   }
+
+
   /* USER CODE END 3 */
 }
 

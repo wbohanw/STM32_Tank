@@ -17,7 +17,8 @@ OBSTACLE_SPEED = 5
 OBSTACLE_MOVEMENT_SPEED = 2
 
 # Initialize serial port
-serial_port = '/dev/cu.usbmodem1103'
+serial_port = '/dev/cu.usbmodem11403'
+
 ser = serial.Serial(port=serial_port, baudrate=115200)
 print(f"Using serial port: {serial_port}")
 
@@ -94,11 +95,11 @@ class Game():
 
     def load_images(self):
         # Load and transform images
-        self.player_img = pygame.image.load('ui/redcar.png').convert_alpha()
+        self.player_img = pygame.image.load('./code/ui/redcar.png').convert_alpha()
         self.player_img = pygame.transform.scale(self.player_img, (PLAYER_WIDTH, PLAYER_HEIGHT))
-        self.obstacle_img = pygame.image.load('ui/cone.png').convert_alpha()
+        self.obstacle_img = pygame.image.load('./code/ui/cone.png').convert_alpha()
         self.obstacle_img = pygame.transform.scale(self.obstacle_img, (OBSTACLE_WIDTH, OBSTACLE_HEIGHT))
-        self.road_img = pygame.image.load('ui/road.png').convert_alpha()
+        self.road_img = pygame.image.load('./code/ui/road.png').convert_alpha()
         self.road_img = pygame.transform.scale(self.road_img, (WIDTH, HEIGHT))
 
     def create_sprites(self):
