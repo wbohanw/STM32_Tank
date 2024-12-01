@@ -43,6 +43,8 @@
 int current_position;
 int calibrationDone;
 
+int buttonStatus_after_Calibration = 0;
+
 // calibration values
 int16_t accelero_p0[3] = {0,0,0};
 int16_t accelero_p1[3] = {0,0,0};
@@ -153,27 +155,37 @@ void play_start_sound(){
 }
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
-    if (GPIO_Pin == myButton_Pin) {
-        printf("Button Pressed! Current Position: %d\r\n", current_position);
+	if(!calibrationDone) {
+	    if (GPIO_Pin == myButton_Pin) {
+	        printf("Button Pressed! Current Position: %d\r\n", current_position);
 
-        // Record accelerometer data
-        if (current_position == 0) {
-            BSP_ACCELERO_AccGetXYZ(accelero_p0);
-        } else if (current_position == 1) {
-            BSP_ACCELERO_AccGetXYZ(accelero_p1);
-        } else if (current_position == 2) {
-            BSP_ACCELERO_AccGetXYZ(accelero_p2);
-        } else if (current_position == 3) {
-            BSP_ACCELERO_AccGetXYZ(accelero_p3);
-        }
+	        // Record accelerometer data
+	        if (current_position == 0) {
+	            BSP_ACCELERO_AccGetXYZ(accelero_p0);
+	        } else if (current_position == 1) {
+	            BSP_ACCELERO_AccGetXYZ(accelero_p1);
+	        } else if (current_position == 2) {
+	            BSP_ACCELERO_AccGetXYZ(accelero_p2);
+	        } else if (current_position == 3) {
+	            BSP_ACCELERO_AccGetXYZ(accelero_p3);
+	        }
 
-        current_position++;
+	        current_position++;
 
-        if (current_position > 3) {
-            calibrationDone = 1;
-            printf("Calibration complete!\r\n");
-        }
-    }
+	        if (current_position > 3) {
+	            calibrationDone = 1;
+	            printf("Calibration complete!\r\n");
+	        }
+	    }
+	}
+
+	if(calibrationDone) {
+		if(GPIO_Pin == myButton_Pin) {
+			buttonStatus_after_Calibration = 1;
+			printf("Button Pressed! Shoot!", current_position);
+		}
+	}
+
 }
 
 void calibrate_accelerometer() {
@@ -303,7 +315,7 @@ int main(void)
 	  // Convert radians to degrees if needed
 	  float tilt_degrees = tilt * 180 / PI;
 
-	  sprintf(txBuffer, "Calibrated Accelero X: %f, Y: %f, Tilt degrees: %f \r\n", ACCX, ACCY, tilt_degrees);
+	  sprintf(txBuffer, "Calibrated Accelero X: %f, Y: %f, Tilt degrees: %f, Shoot: %f \r\n", ACCX, ACCY, tilt_degrees, buttonStatus_after_Calibration);
 
 //	  sprintf(output, "Accelero X: %d, Y: %d, Z: %d \r\n", accelero[0], accelero[1], accelero[2]);
 	  HAL_Delay(10);
