@@ -18,15 +18,28 @@ This project is a Python-based tank shooting game implemented using the [Arcade]
    ```bash
    pip install arcade pillow pyserial
 
-2. **Run STM file**
+2. **Config Port Path (MacOS)**
+   - run
+  ```bash
+   ls /dev/tty.*
+  ```
+   - You will see
+     `/dev/cu.usbmodemXXXX`
+     change line 39 in test.py
+```python
+  39 self.serial_port = '/dev/cu.usbmodemXXXX'  # Update with your serial port
+```
+  
+3. **Run STM file**
    - Open main.c in STM32CUBE
    - Run debug mode and press continue on the top menu bar
-3. **Run python**
+4. **Run python**
    Run the following code in the terminal
    ```bash
    pyhton test.py
 
-4. Once the game start, you will need to calibrate the sensor, press Blue button(user) on STM32 Board 4 times
-5. Once you hear a sound indicating calibration is down, the game start
-6. use the STM board as a Console and Blue button to shoot
-7. Enjoy the game
+5. Once the game start, you will need to calibrate the sensor, press Blue button(user) on STM32 Board 4 times
+6. Once you hear a sound indicating calibration is down, the game start
+7. use the STM board as a Console and Blue button to shoot
+8. Enjoy the game
+
