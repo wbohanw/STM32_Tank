@@ -17,7 +17,11 @@ OBSTACLE_SPEED = 5
 OBSTACLE_MOVEMENT_SPEED = 2
 
 # Initialize serial port
+<<<<<<< Updated upstream
 serial_port = '/dev/cu.usbmodem11403'
+=======
+serial_port = '/dev/cu.usbmodem1303'
+>>>>>>> Stashed changes
 
 ser = serial.Serial(port=serial_port, baudrate=115200)
 print(f"Using serial port: {serial_port}")
@@ -167,6 +171,7 @@ class Game():
             self.clock.tick(FPS)
             # Update
             serial_data = ser.readline().decode()
+            print(serial_data)
             angle_str = serial_data[-13:-3].replace(" ", "").lstrip(':')
             # Convert the string to a float
             try:
