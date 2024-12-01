@@ -20,15 +20,15 @@ This project is a Python-based tank shooting game implemented using the [Arcade]
 
 2. **Config Port Path (MacOS)**
    - run
-  ```bash
-   ls /dev/tty.*
-  ```
+    ```bash
+     ls /dev/tty.*
+    ```
    - You will see
      `/dev/cu.usbmodemXXXX`
      change line 39 in test.py
-```python
-  39 self.serial_port = '/dev/cu.usbmodemXXXX'  # Update with your serial port
-```
+    ```python
+      39 self.serial_port = '/dev/cu.usbmodemXXXX'  # Update with your serial port
+    ```
   
 3. **Run STM file**
    - Open main.c in STM32CUBE
