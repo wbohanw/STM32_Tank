@@ -124,7 +124,7 @@ static void MX_TIM2_Init(void);
 void generate_gameover_sound_waves(){
 	//G4 : 392 Hz
 	for (int j = 0; j < 112; j++){
-		 sine_g4[j] = (uint8_t)((arm_sin_f32((2*M_PI/112)*j)+1)*2047.5f);
+		 sine_g4[j] = (uint8_t)((arm_sin_f32((2*M_PI/112)*j)+1)*20470.5f);
 	}
 	//E4: 330 Hz
 	for (int j=0; j < 134; j++) {
