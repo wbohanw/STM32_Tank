@@ -36,7 +36,7 @@ class ExampleWindow(arcade.Window):
         super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
 
         # Initialize serial port
-        self.serial_port = '/dev/cu.usbmodem1303'  # Update with your serial port
+        self.serial_port = '/dev/cu.usbmodem1103'  # Update with your serial port
         self.ser = serial.Serial(port=self.serial_port, baudrate=115200)
         print(f"Using serial port: {self.serial_port}")
 
@@ -238,7 +238,7 @@ class ExampleWindow(arcade.Window):
     def draw_score(self):
         score_display = arcade.Text(
             f"Score: {self.score}", 10, SCREEN_HEIGHT - 20,
-            anchor_x='left', color=arcade.color.WHITE, font_size=14)
+            anchor_x='left', color=arcade.color.WHITE, font_size=30)
         score_display.draw()
 
     def restart_game(self):
