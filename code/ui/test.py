@@ -3,7 +3,7 @@ import math
 import random
 import serial  # Import the serial library
 
-TANK_SPEED_PIXELS = 40  # How many pixels per second the tank travels
+TANK_SPEED_PIXELS = 55  # How many pixels per second the tank travels
 TANK_TURN_SPEED_DEGREES = 40  # How fast the tank's body can turn
 BULLET_SPEED_PIXELS = 6  # How many pixels per second the bullet travels
 ZOMBIE_SPEED_PIXELS = 1  # How many pixels per second the zombie travels
@@ -229,7 +229,7 @@ class ExampleWindow(arcade.Window):
     def show_score_text(self, position):
         score_text = arcade.Text(
             "+1", position[0], position[1],
-            anchor_x='center', color=arcade.color.WHITE, font_size=12)
+            anchor_x='center', color=arcade.color.WHITE, font_size=10)
         self.score_texts.append((score_text, 2.0))  # 2 seconds duration
 
     def update_score_texts(self, delta_time):
@@ -237,7 +237,7 @@ class ExampleWindow(arcade.Window):
 
     def draw_score(self):
         score_display = arcade.Text(
-            f"Score: {self.score}", 10, SCREEN_HEIGHT - 20,
+            f"Score: {self.score}", 10, SCREEN_HEIGHT - 45,
             anchor_x='left', color=arcade.color.WHITE, font_size=30)
         score_display.draw()
 
