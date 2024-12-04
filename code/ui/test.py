@@ -13,7 +13,7 @@ SCREEN_HEIGHT = 900
 SIZE_TANK = 100
 SIZE_ZOMBIE = 100
 SCREEN_MIDDLE = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
-SPAWN_RATE = 0.03
+SPAWN_RATE = 0.02
 SCREEN_TITLE = "Rotating Tank Example"
 
 from PIL import Image
@@ -36,7 +36,7 @@ class ExampleWindow(arcade.Window):
         super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
 
         # Initialize serial port
-        self.serial_port = '/dev/cu.usbmodem1103'  # Update with your serial port
+        self.serial_port = '/dev/cu.usbmodem11303'  # Update with your serial port
         self.ser = serial.Serial(port=self.serial_port, baudrate=115200)
         print(f"Using serial port: {self.serial_port}")
 

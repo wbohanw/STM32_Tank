@@ -36,7 +36,7 @@
 /* USER CODE BEGIN PD */
 #define SIZE_BUFFER 320
 #define SAMPLE_RATE 8000
-#define DURATION 0.25 // 250 milliseconds
+#define DURATION 0.25 // 250 milliseconds  the sound duration
 #define NUM_SAMPLES 2000
 
 
